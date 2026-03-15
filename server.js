@@ -20,9 +20,22 @@ const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider)
 const MAX_PAYMENT = 500 // CELO cap per payment
 
 // =============================
+// ROOT ENDPOINT (Vercel preview)
+// =============================
+app.get("/", (req, res) => {
+  res.json({
+    agent: "Celo Local Commerce Agent ✅",
+    endpoints: {
+      pay: "POST /pay {message: 'Pay 10 rupee to vendor'}",
+      balance: "GET /balance", 
+      payments: "GET /payments"
+    }
+  })
+})
+
+// =============================
 // PAYMENT ENDPOINT
 // =============================
-
 app.post("/pay", async (req, res) => {
   const text = req.body.message
   if (!text) {
@@ -36,15 +49,13 @@ app.post("/pay", async (req, res) => {
     return res.json({
       success: false,
       error: "Could not understand message",
-      reply:
-        "Sorry, I could not understand that. Try: 'Pay 1 rupee to ramesh' or 'Show last payment'."
+      reply: "Sorry, I could not understand that. Try: 'Pay 1 rupee to ramesh' or 'Show last payment'."
     })
   }
 
   // =============================
   // QUERY COMMANDS
   // =============================
-
   if (parsed.type === "query") {
     if (parsed.action === "last_payment") {
       const last = memory.getLastPayment()
@@ -82,7 +93,6 @@ app.post("/pay", async (req, res) => {
   // =============================
   // PAYMENT EXECUTION
   // =============================
-
   try {
     let amountToSend = parsed.amount
 
@@ -157,7 +167,6 @@ app.post("/pay", async (req, res) => {
 // =============================
 // WALLET BALANCE API
 // =============================
-
 app.get("/balance", async (req, res) => {
   try {
     const balance = await provider.getBalance(wallet.address)
@@ -176,12 +185,12 @@ app.get("/balance", async (req, res) => {
 // =============================
 // PAYMENT HISTORY API
 // =============================
-
 app.get("/payments", (req, res) => {
   const data = memory.getAll()
   res.json(data)
 })
 
-app.listen(3000, () => {
-  console.log("Agent running on port 3000")
+const port = process.env.PORT || 3000
+app.listen(port, () => {
+  console.log(`Agent running on port ${port}`)
 })
