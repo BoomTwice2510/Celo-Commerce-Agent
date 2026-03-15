@@ -1,0 +1,13 @@
+module.exports = {
+
+ramesh:"0x1f410eb28bec2247f617e6b86b10350d77dc9679",
+
+milk:"0x1f410eb28bec2247f617e6b86b10350d77dc9679",
+
+electricity:"0x1f410eb28bec2247f617e6b86b10350d77dc9679",
+
+internet:"0x1f410eb28bec2247f617e6b86b10350d77dc9679",
+
+water:"0x1f410eb28bec2247f617e6b86b10350d77dc9679"
+
+}

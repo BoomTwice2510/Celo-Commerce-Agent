@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Celo Commerce Agent</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+  :root{
+    --celo-yellow:#FBCC5C;
+    --celo-green:#35D07F;
+    --text-dark:#111827;
+    --text-muted:#6b7280;
+    --border-soft:#e5e7eb;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
+    background:#f9fafb;
+    color:var(--text-dark);
+    display:flex;
+    justify-content:center;
+    padding:16px 8px;
+  }
+
+  .app{
+    width:100%;
+    max-width:960px;
+    padding:16px;
+    border-radius:18px;
+    background:#ffffff;
+    box-shadow:0 10px 30px rgba(15,23,42,.08);
+    border:2px solid #facc15;
+  }
+
+  /* HEADER */
+
+  .header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+
+  .title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .logo-wrap{
+    width:46px;
+    height:46px;
+    border-radius:16px;
+    background:#fefce8;
+    border:1px solid rgba(234,179,8,.6);
+    padding:4px;
+  }
+
+  .logo-wrap img{
+    width:100%;
+    height:100%;
+    display:block;
+    border-radius:12px;
+  }
+
+  .title-text{
+    display:flex;
+    flex-direction:column;
+  }
+
+  .title-main{
+    font-size:18px;
+    font-weight:650;
+  }
+
+  .title-sub{
+    font-size:12px;
+    color:var(--text-muted);
+  }
+
+  .pill-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:4px;
+  }
+
+  .pill{
+    font-size:10px;
+    padding:3px 8px;
+    border-radius:999px;
+    border:1px solid #e5e7eb;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:#4b5563;
+    background:#f9fafb;
+  }
+
+  /* WALLET */
+
+  .wallet{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+
+  .balance{
+    background:#ecfdf5;
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid rgba(22,163,74,.8);
+    font-size:12px;
+    display:flex;
+    gap:4px;
+    align-items:center;
+    color:#166534;
+    box-shadow:0 0 0 1px rgba(187,247,208,1);
+  }
+
+  .balance .amount{font-weight:600;}
+
+  button{
+    border:none;
+    border-radius:999px;
+    padding:7px 12px;
+    cursor:pointer;
+    background:linear-gradient(135deg,#22c55e,#16a34a);
+    color:white;
+    font-size:12px;
+    font-weight:500;
+    letter-spacing:.02em;
+    box-shadow:0 5px 14px rgba(22,163,74,.35);
+    border:1px solid rgba(21,128,61,.8);
+    transition:transform .12s ease,box-shadow .12s ease,filter .12s ease,border-color .12s ease;
+  }
+
+  button:hover{
+    transform:translateY(-1px);
+    box-shadow:0 8px 18px rgba(22,163,74,.45);
+    filter:brightness(1.03);
+    border-color:#16a34a;
+  }
+
+  .icon-btn{
+    background:linear-gradient(135deg,#facc15,#eab308);
+    color:#78350f;
+    box-shadow:0 5px 12px rgba(234,179,8,.35);
+    border:1px solid rgba(202,138,4,.85);
+  }
+
+  /* CARDS */
+
+  .card{
+    background:#ffffff;
+    border-radius:16px;
+    border:1px solid rgba(226,232,240,1);
+    box-shadow:0 6px 18px rgba(15,23,42,.04);
+    position:relative;
+  }
+
+  .card::before{
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    top:0;
+    height:3px;
+    border-radius:16px 16px 0 0;
+    background:linear-gradient(90deg,#22c55e,#facc15);
+    opacity:.6;
+  }
+
+  /* CHAT */
+
+  .chat{
+    height:360px;
+    overflow:auto;
+    padding:10px 10px 4px;
+    background:#f3f4f6;
+    border-radius:16px 16px 0 0;
+  }
+
+  .chat::-webkit-scrollbar{width:5px;}
+  .chat::-webkit-scrollbar-thumb{
+    background:#d4d4d4;
+    border-radius:999px;
+  }
+
+  .msg{
+    max-width:78%;
+    padding:8px 10px;
+    margin:4px 0;
+    border-radius:16px;
+    font-size:13px;
+    line-height:1.35;
+    position:relative;
+  }
+
+  .user{
+    margin-left:auto;
+    margin-right:4px;
+    background:#dcfce7;
+    border-bottom-right-radius:4px;
+    border:1px solid #bbf7d0;
+  }
+
+  .user::after{
+    content:"";
+    position:absolute;
+    right:-4px;
+    bottom:0;
+    border-width:6px 0 0 6px;
+    border-style:solid;
+    border-color:#bbf7d0 transparent transparent transparent;
+  }
+
+  .agent{
+    margin-right:auto;
+    margin-left:4px;
+    background:#fef9c3;
+    border-bottom-left-radius:4px;
+    border:1px solid #fef3c7;
+  }
+
+  .agent::after{
+    content:"";
+    position:absolute;
+    left:-4px;
+    bottom:0;
+    border-width:6px 6px 0 0;
+    border-style:solid;
+    border-color:#fef9c3 transparent transparent transparent;
+  }
+
+  .msg a{
+    color:#15803d;
+    text-decoration:underline;
+  }
+
+  .typing{
+    font-size:11px;
+    color:var(--text-muted);
+  }
+
+  /* INPUT */
+
+  .inputArea{
+    display:flex;
+    gap:8px;
+    padding:8px;
+    border-top:1px solid var(--border-soft);
+    background:#ffffff;
+    border-radius:0 0 16px 16px;
+  }
+
+  input{
+    flex:1;
+    padding:9px 10px;
+    border-radius:999px;
+    border:1px solid #e5e7eb;
+    background:#ffffff;
+    color:var(--text-dark);
+    font-size:13px;
+    outline:none;
+  }
+
+  input::placeholder{color:#9ca3af;}
+
+  input:focus{
+    border-color:#22c55e;
+    box-shadow:0 0 0 1px rgba(34,197,94,.3);
+  }
+
+  .send-btn{
+    background:linear-gradient(135deg,#facc15,#22c55e);
+    white-space:nowrap;
+  }
+
+  /* SUGGESTIONS */
+
+  .suggest{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    padding:6px 8px 8px;
+    background:#ffffff;
+    border-top:1px solid var(--border-soft);
+  }
+
+  .suggest div{
+    padding:5px 9px;
+    border-radius:999px;
+    font-size:11px;
+    cursor:pointer;
+    border:1px solid #e5e7eb;
+    background:#f9fafb;
+    color:#4b5563;
+    transition:background .12s ease,border-color .12s ease;
+  }
+
+  .suggest div:hover{
+    background:#fefce8;
+    border-color:#facc15;
+  }
+
+  /* DASHBOARD */
+
+  .dashboard{
+    margin-top:14px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+
+  @media(max-width:768px){
+    .dashboard{grid-template-columns:1fr;}
+  }
+
+  .dashboard .card{
+    padding:10px 10px 12px;
+  }
+
+  .card h3{
+    margin:0 0 6px;
+    font-size:13px;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    color:#6b7280;
+  }
+
+  /* Activity */
+
+  #activity{
+    max-height:220px;
+    overflow:auto;
+    padding-right:2px;
+    font-size:12px;
+  }
+
+  #activity::-webkit-scrollbar{width:5px;}
+  #activity::-webkit-scrollbar-thumb{
+    background:#d4d4d4;
+    border-radius:999px;
+  }
+
+  .activityItem{
+    background:#f9fafb;
+    border-radius:8px;
+    border-left:3px solid var(--celo-green);
+    padding:6px 8px;
+    margin-bottom:6px;
+    color:#374151;
+  }
+
+  /* Payments */
+
+  #chart{
+    width:100%;
+  }
+
+  /* Leaderboard (special highlight) */
+
+  .leader-card{
+    border:1px solid #facc15;
+    box-shadow:0 6px 18px rgba(234,179,8,.18);
+  }
+
+  .leader-card::before{
+    background:linear-gradient(90deg,#facc15,#22c55e);
+    opacity:.9;
+  }
+
+  #leader div{
+    background:#fefce8;
+    border-radius:8px;
+    padding:6px 8px;
+    border:1px solid #fde68a;
+    margin-bottom:6px;
+    font-size:12px;
+    display:flex;
+    justify-content:space-between;
+    color:#374151;
+  }
+
+  #leader div span.name{font-weight:500;}
+  #leader div span.amt{
+    font-variant-numeric:tabular-nums;
+    color:#16a34a;
+  }
+
+  /* QR */
+
+  #reader{
+    margin-top:6px;
+    max-width:220px;
+    border-radius:12px;
+    overflow:hidden;
+    border:1px solid #e5e7eb;
+  }
+
+  @media(max-width:600px){
+    .app{
+      padding:12px;
+      border-radius:16px;
+    }
+    .title-main{font-size:16px;}
+    .chat{height:320px;}
+  }
+  </style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="title">
+      <div class="logo-wrap">
+        <img src="logo.png" alt="Celo Agent">
+      </div>
+      <div class="title-text">
+        <div class="title-main">Celo Commerce Agent</div>
+        <div class="title-sub">Local commerce • Smart Celo payments</div>
+        <div class="pill-row">
+          <div class="pill">On‑chain payments</div>
+          <div class="pill">Celo • Sepolia</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wallet">
+      <div id="balance" class="balance">
+        💰 <span>Balance:</span> <span class="amount">--</span>
+      </div>
+      <button onclick="connectWallet()">Connect</button>
+      <button class="icon-btn" onclick="voice()">🎤</button>
+      <button class="icon-btn" onclick="startQR()">QR</button>
+      <div id="reader"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div id="chat" class="chat"></div>
+    <div class="suggest" id="suggest"></div>
+    <div class="inputArea">
+      <input id="input" placeholder="Pay 1 rupee to ramesh">
+      <button class="send-btn" onclick="send()">Send</button>
+    </div>
+  </div>
+
+  <div class="dashboard">
+    <div class="card">
+      <h3>📡 Agent Activity</h3>
+      <div id="activity"></div>
+    </div>
+
+    <div class="card">
+      <h3>📊 Payments</h3>
+      <canvas id="chart"></canvas>
+    </div>
+
+    <div class="card leader-card" style="grid-column:1 / -1;">
+      <h3>🏆 Vendor Leaderboard</h3>
+      <div id="leader"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const chat=document.getElementById("chat")
+let chart=null
+
+function add(type,text){
+  const div=document.createElement("div")
+  div.className="msg "+type
+  div.innerHTML=text
+  chat.appendChild(div)
+  chat.scrollTop=chat.scrollHeight
+}
+
+function typing(){
+  const div=document.createElement("div")
+  div.className="msg agent typing"
+  div.id="typing"
+  div.innerHTML="<span>Agent typing…</span>"
+  chat.appendChild(div)
+  chat.scrollTop=chat.scrollHeight
+}
+
+function removeTyping(){
+  const t=document.getElementById("typing")
+  if(t) t.remove()
+}
+
+function addActivity(text){
+  const box=document.getElementById("activity")
+  const div=document.createElement("div")
+  div.className="activityItem"
+  div.innerHTML=text
+  box.prepend(div)
+}
+
+async function send(){
+  const input=document.getElementById("input")
+  const text=input.value.trim()
+  if(!text) return
+
+  add("user",text)
+  input.value=""
+  typing()
+
+  try{
+    const res=await fetch("http://localhost:3000/pay",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({message:text})
+    })
+    const data=await res.json()
+    removeTyping()
+    add("agent",data.reply)
+    addActivity("🤖 "+data.reply)
+
+    if(data.txHash){
+      add("agent","🔗 <a target='_blank' href='https://sepolia.celoscan.io/tx/"+data.txHash+"'>View Transaction</a>")
+      addActivity("⛓️ Transaction executed")
+    }
+
+    loadStats()
+  }catch(e){
+    removeTyping()
+    add("agent","⚠️ Something went wrong talking to the payment agent.")
+    addActivity("⚠️ Backend error")
+  }
+}
+
+async function connectWallet(){
+  if(!window.ethereum){
+    alert("Install MetaMask")
+    return
+  }
+  const accounts=await ethereum.request({method:"eth_requestAccounts"})
+  loadBalance(accounts[0])
+}
+
+async function loadBalance(address){
+  const body={
+    jsonrpc:"2.0",
+    method:"eth_getBalance",
+    params:[address,"latest"],
+    id:1
+  }
+
+  const res=await fetch("https://forno.celo.org",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(body)
+  })
+  const data=await res.json()
+  const celo=parseInt(data.result,16)/1e18
+
+  const balanceEl=document.getElementById("balance")
+  balanceEl.querySelector(".amount").innerText=celo.toFixed(3)+" CELO"
+}
+
+function voice(){
+  const rec=new webkitSpeechRecognition()
+  rec.lang="en-US"
+  rec.onresult=e=>{
+    document.getElementById("input").value=e.results[0][0].transcript
+  }
+  rec.start()
+}
+
+async function loadStats(){
+  try{
+    const res=await fetch("memory.json")
+    const data=await res.json()
+
+    let vendors={}
+    data.forEach(tx=>{
+      vendors[tx.vendor]=(vendors[tx.vendor]||0)+tx.celoSent
+      addActivity(`💸 Paid ${tx.celoSent} CELO to ${tx.vendor}`)
+    })
+
+    const ctx=document.getElementById("chart")
+    if(chart) chart.destroy()
+
+    chart=new Chart(ctx,{
+      type:"bar",
+      data:{
+        labels:Object.keys(vendors),
+        datasets:[{
+          label:"CELO spent",
+          data:Object.values(vendors),
+          backgroundColor:"#22c55e",
+          borderRadius:6
+        }]
+      },
+      options:{
+        plugins:{
+          legend:{labels:{color:"#4b5563"}}
+        },
+        scales:{
+          x:{ticks:{color:"#6b7280"},grid:{display:false}},
+          y:{ticks:{color:"#6b7280"},grid:{color:"#e5e7eb"}}
+        }
+      }
+    })
+
+    const leader=document.getElementById("leader")
+    leader.innerHTML=""
+    Object.entries(vendors)
+      .sort((a,b)=>b[1]-a[1])
+      .forEach((v,i)=>{
+        leader.innerHTML+=`
+          <div>
+            <span class="name">${i+1}. ${v[0]}</span>
+            <span class="amt">${v[1].toFixed(3)} CELO</span>
+          </div>`
+      })
+  }catch{}
+}
+
+const suggestions=[
+  "Pay 1 rupee to ramesh",
+  "Show last payment",
+  "Show total spending",
+  "How much did I pay ramesh"
+]
+
+const box=document.getElementById("suggest")
+suggestions.forEach(s=>{
+  const d=document.createElement("div")
+  d.textContent="⚡ "+s
+  d.onclick=()=>{ document.getElementById("input").value=s }
+  box.appendChild(d)
+})
+
+loadStats()
+
+function startQR(){
+  const html5QrCode = new Html5Qrcode("reader")
+  html5QrCode.start(
+    { facingMode: "environment" },
+    { fps:10, qrbox:250 },
+    qrCodeMessage => {
+      add("agent","📷 QR scanned")
+      handleQR(qrCodeMessage)
+      html5QrCode.stop()
+    },
+    errorMessage => {}
+  )
+}
+
+function handleQR(data){
+  try{
+    const obj = JSON.parse(data)
+    const cmd = `Pay ${obj.amount} to ${obj.vendor}`
+    add("agent","Merchant detected: "+obj.vendor)
+    document.getElementById("input").value = cmd
+    send()
+  }catch{
+    add("agent","Invalid QR")
+  }
+}
+</script>
+</body>
+</html>
