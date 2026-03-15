@@ -38,8 +38,6 @@
     border:2px solid #facc15;
   }
 
-  /* HEADER */
-
   .header{
     display:flex;
     justify-content:space-between;
@@ -104,8 +102,6 @@
     background:#f9fafb;
   }
 
-  /* WALLET */
-
   .wallet{
     display:flex;
     gap:8px;
@@ -157,8 +153,6 @@
     border:1px solid rgba(202,138,4,.85);
   }
 
-  /* CARDS */
-
   .card{
     background:#ffffff;
     border-radius:16px;
@@ -178,8 +172,6 @@
     background:linear-gradient(90deg,#22c55e,#facc15);
     opacity:.6;
   }
-
-  /* CHAT */
 
   .chat{
     height:360px;
@@ -251,8 +243,6 @@
     color:var(--text-muted);
   }
 
-  /* INPUT */
-
   .inputArea{
     display:flex;
     gap:8px;
@@ -285,8 +275,6 @@
     white-space:nowrap;
   }
 
-  /* SUGGESTIONS */
-
   .suggest{
     display:flex;
     flex-wrap:wrap;
@@ -312,8 +300,6 @@
     border-color:#facc15;
   }
 
-  /* DASHBOARD */
-
   .dashboard{
     margin-top:14px;
     display:grid;
@@ -337,8 +323,6 @@
     color:#6b7280;
   }
 
-  /* Activity */
-
   #activity{
     max-height:220px;
     overflow:auto;
@@ -361,13 +345,9 @@
     color:#374151;
   }
 
-  /* Payments */
-
   #chart{
     width:100%;
   }
-
-  /* Leaderboard (special highlight) */
 
   .leader-card{
     border:1px solid #facc15;
@@ -396,8 +376,6 @@
     font-variant-numeric:tabular-nums;
     color:#16a34a;
   }
-
-  /* QR */
 
   #reader{
     margin-top:6px;
@@ -431,7 +409,7 @@
         <div class="title-sub">Local commerce • Smart Celo payments</div>
         <div class="pill-row">
           <div class="pill">On‑chain payments</div>
-          <div class="pill">Celo • Sepolia</div>
+          <div class="pill">Celo •</div>
         </div>
       </div>
     </div>
@@ -473,85 +451,117 @@
     </div>
   </div>
 
+  <!-- Current vendors list -->
+  <div class="card" style="margin-top:12px;padding:10px 10px 12px;">
+    <h3>📚 Current vendors</h3>
+    <div id="vendor-list" style="font-size:12px;color:#4b5563;"></div>
+  </div>
+
+  <!-- Vendor onboarding (admin) -->
+  <div class="card" style="margin-top:12px;padding:10px 10px 12px;">
+    <h3>🛍️ Vendor onboarding (admin)</h3>
+    <input id="vendor-name" placeholder="Vendor name" />
+    <input id="vendor-address" placeholder="Wallet address (0x...)" />
+    <input id="vendor-limit" placeholder="Limit in CELO (optional)" />
+    <input id="vendor-pin" placeholder="Admin PIN" type="password" />
+    <button onclick="addVendor()">Add vendor</button>
+    <div id="vendor-status" style="font-size:12px;margin-top:4px;color:#4b5563;"></div>
+  </div>
+
 </div>
 
 <script>
-const chat=document.getElementById("chat")
-let chart=null
+const chat=document.getElementById("chat");
+let chart=null;
+
+/* suggestions array (base + dynamic vendors) */
+let suggestions = [
+  "Show last payment",
+  "Show total spending"
+];
+
+const suggestBox = document.getElementById("suggest");
+
+function renderSuggestions() {
+  suggestBox.innerHTML = "";
+  suggestions.forEach(s=>{
+    const d=document.createElement("div");
+    d.textContent="⚡ "+s;
+    d.onclick=()=>{ document.getElementById("input").value=s };
+    suggestBox.appendChild(d);
+  });
+}
 
 function add(type,text){
-  const div=document.createElement("div")
-  div.className="msg "+type
-  div.innerHTML=text
-  chat.appendChild(div)
-  chat.scrollTop=chat.scrollHeight
+  const div=document.createElement("div");
+  div.className="msg "+type;
+  div.innerHTML=text;
+  chat.appendChild(div);
+  chat.scrollTop=chat.scrollHeight;
 }
 
 function typing(){
-  const div=document.createElement("div")
-  div.className="msg agent typing"
-  div.id="typing"
-  div.innerHTML="<span>Agent typing…</span>"
-  chat.appendChild(div)
-  chat.scrollTop=chat.scrollHeight
+  const div=document.createElement("div");
+  div.className="msg agent typing";
+  div.id="typing";
+  div.innerHTML="<span>Agent typing…</span>";
+  chat.appendChild(div);
+  chat.scrollTop=chat.scrollHeight;
 }
 
 function removeTyping(){
-  const t=document.getElementById("typing")
-  if(t) t.remove()
+  const t=document.getElementById("typing");
+  if(t) t.remove();
 }
 
 function addActivity(text){
-  const box=document.getElementById("activity")
-  const div=document.createElement("div")
-  div.className="activityItem"
-  div.innerHTML=text
-  box.prepend(div)
+  const box=document.getElementById("activity");
+  const div=document.createElement("div");
+  div.className="activityItem";
+  div.innerHTML=text;
+  box.prepend(div);
 }
 
 async function send(){
-  const input=document.getElementById("input")
-  const text=input.value.trim()
-  if(!text) return
+  const input=document.getElementById("input");
+  const text=input.value.trim();
+  if(!text) return;
 
-  add("user",text)
-  input.value=""
-  typing()
+  add("user",text);
+  input.value="";
+  typing();
 
   try{
     const res = await fetch("/api/pay",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({
-    address:"0xRecipientWallet",
-    amount:"0.001"
-  })
-})
-    const data=await res.json()
-    removeTyping()
-    add("agent",data.reply)
-    addActivity("🤖 "+data.reply)
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ message:text })
+    });
+    const data=await res.json();
+    removeTyping();
+    add("agent",data.reply);
+    addActivity("🤖 "+data.reply);
 
     if(data.txHash){
-      add("agent","🔗 <a target='_blank' href='https://celoscan.io/tx"+data.txHash+"'>View Transaction</a>")
-      addActivity("⛓️ Transaction executed")
+      add("agent","🔗 <a target='_blank' href='https://celoscan.io/tx/"+data.txHash+"'>View Transaction</a>");
+      addActivity("⛓️ Transaction executed");
     }
 
-    loadStats()
+    loadStats();
   }catch(e){
-    removeTyping()
-    add("agent","⚠️ Something went wrong talking to the payment agent.")
-    addActivity("⚠️ Backend error")
+    removeTyping();
+    add("agent","⚠️ Something went wrong talking to the payment agent.");
+    addActivity("⚠️ Backend error");
   }
 }
 
 async function connectWallet(){
   if(!window.ethereum){
-    alert("Install MetaMask")
-    return
+    alert("Install MetaMask");
+    return;
   }
-  const accounts=await ethereum.request({method:"eth_requestAccounts"})
-  loadBalance(accounts[0])
+  const accounts=await ethereum.request({method:"eth_requestAccounts"});
+  loadBalance(accounts[0]);
 }
 
 async function loadBalance(address){
@@ -560,42 +570,42 @@ async function loadBalance(address){
     method:"eth_getBalance",
     params:[address,"latest"],
     id:1
-  }
+  };
 
   const res=await fetch("https://forno.celo.org",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify(body)
-  })
-  const data=await res.json()
-  const celo=parseInt(data.result,16)/1e18
+  });
+  const data=await res.json();
+  const celo=parseInt(data.result,16)/1e18;
 
-  const balanceEl=document.getElementById("balance")
-  balanceEl.querySelector(".amount").innerText=celo.toFixed(3)+" CELO"
+  const balanceEl=document.getElementById("balance");
+  balanceEl.querySelector(".amount").innerText=celo.toFixed(3)+" CELO";
 }
 
 function voice(){
-  const rec=new webkitSpeechRecognition()
-  rec.lang="en-US"
+  const rec=new webkitSpeechRecognition();
+  rec.lang="en-US";
   rec.onresult=e=>{
-    document.getElementById("input").value=e.results[0][0].transcript
-  }
-  rec.start()
+    document.getElementById("input").value=e.results[0][0].transcript;
+  };
+  rec.start();
 }
 
 async function loadStats(){
   try{
-    const res=await fetch("memory.json")
-    const data=await res.json()
+    const res=await fetch("memory.json");
+    const data=await res.json();
 
-    let vendors={}
+    let vendors={};
     data.forEach(tx=>{
-      vendors[tx.vendor]=(vendors[tx.vendor]||0)+tx.celoSent
-      addActivity(`💸 Paid ${tx.celoSent} CELO to ${tx.vendor}`)
-    })
+      vendors[tx.vendor]=(vendors[tx.vendor]||0)+tx.celoSent;
+      addActivity(`💸 Paid ${tx.celoSent} CELO to ${tx.vendor}`);
+    });
 
-    const ctx=document.getElementById("chart")
-    if(chart) chart.destroy()
+    const ctx=document.getElementById("chart");
+    if(chart) chart.destroy();
 
     chart=new Chart(ctx,{
       type:"bar",
@@ -609,18 +619,16 @@ async function loadStats(){
         }]
       },
       options:{
-        plugins:{
-          legend:{labels:{color:"#4b5563"}}
-        },
+        plugins:{ legend:{labels:{color:"#4b5563"}} },
         scales:{
           x:{ticks:{color:"#6b7280"},grid:{display:false}},
           y:{ticks:{color:"#6b7280"},grid:{color:"#e5e7eb"}}
         }
       }
-    })
+    });
 
-    const leader=document.getElementById("leader")
-    leader.innerHTML=""
+    const leader=document.getElementById("leader");
+    leader.innerHTML="";
     Object.entries(vendors)
       .sort((a,b)=>b[1]-a[1])
       .forEach((v,i)=>{
@@ -628,53 +636,96 @@ async function loadStats(){
           <div>
             <span class="name">${i+1}. ${v[0]}</span>
             <span class="amt">${v[1].toFixed(3)} CELO</span>
-          </div>`
-      })
+          </div>`;
+      });
   }catch{}
 }
 
-const suggestions=[
-  "Pay 1 rupee to ramesh",
-  "Show last payment",
-  "Show total spending",
-  "How much did I pay ramesh"
-]
-
-const box=document.getElementById("suggest")
-suggestions.forEach(s=>{
-  const d=document.createElement("div")
-  d.textContent="⚡ "+s
-  d.onclick=()=>{ document.getElementById("input").value=s }
-  box.appendChild(d)
-})
-
-loadStats()
+renderSuggestions();
+loadStats();
 
 function startQR(){
-  const html5QrCode = new Html5Qrcode("reader")
+  const html5QrCode = new Html5Qrcode("reader");
   html5QrCode.start(
     { facingMode: "environment" },
     { fps:10, qrbox:250 },
     qrCodeMessage => {
-      add("agent","📷 QR scanned")
-      handleQR(qrCodeMessage)
-      html5QrCode.stop()
+      add("agent","📷 QR scanned");
+      handleQR(qrCodeMessage);
+      html5QrCode.stop();
     },
     errorMessage => {}
-  )
+  );
 }
 
 function handleQR(data){
   try{
-    const obj = JSON.parse(data)
-    const cmd = `Pay ${obj.amount} to ${obj.vendor}`
-    add("agent","Merchant detected: "+obj.vendor)
-    document.getElementById("input").value = cmd
-    send()
+    const obj = JSON.parse(data);
+    const cmd = `Pay ${obj.amount} to ${obj.vendor}`;
+    add("agent","Merchant detected: "+obj.vendor);
+    document.getElementById("input").value = cmd;
+    send();
   }catch{
-    add("agent","Invalid QR")
+    add("agent","Invalid QR");
   }
 }
+
+/* Vendor onboarding helpers */
+async function addVendor() {
+  const body = {
+    name: document.getElementById("vendor-name").value,
+    address: document.getElementById("vendor-address").value,
+    limit: document.getElementById("vendor-limit").value,
+    pin: document.getElementById("vendor-pin").value
+  };
+
+  const res = await fetch("/api/add-vendor", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(body)
+  });
+
+  const data = await res.json();
+  const statusBox = document.getElementById("vendor-status");
+
+  if (data.success) {
+    statusBox.textContent = `Added vendor: ${data.vendor.name}`;
+    addActivity(`🛍️ Onboarded vendor: ${data.vendor.name} (${data.vendor.address})`);
+    await refreshVendors();
+  } else {
+    statusBox.textContent = `Error: ${data.error}`;
+  }
+}
+
+async function refreshVendors() {
+  try{
+    const res = await fetch("/api/vendors");
+    const data = await res.json();
+    if (!data.success) return;
+
+    // Current vendors card
+    const box = document.getElementById("vendor-list");
+    box.innerHTML = "";
+    data.vendors.forEach(v => {
+      const div = document.createElement("div");
+      div.textContent = `${v.name} — ${v.address} (limit ${v.limit} CELO)`;
+      box.appendChild(div);
+    });
+
+    // Suggestions: add vendor-specific sentences
+    const vendorPhrases = data.vendors.map(v => `Pay 1 rupee to ${v.name}`);
+    const base = [
+      "Show last payment",
+      "Show total spending"
+    ];
+    suggestions = [...new Set([...vendorPhrases, ...base])];
+    renderSuggestions();
+  }catch(e){
+    console.error(e);
+  }
+}
+
+refreshVendors();
 </script>
 </body>
 </html>

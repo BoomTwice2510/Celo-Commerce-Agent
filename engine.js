@@ -1,7 +1,8 @@
-const parse = require("./parser");
+const parse = require("./parser").default;
 const sendTx = require("./sendTx");
 const inrToCelo = require("./convert");
 const memory = require("./memory");
+const { findVendor } = require("./vendorStore");
 
 async function runAgent(message) {
   try {
@@ -48,38 +49,47 @@ async function runAgent(message) {
       return { reply: "Unknown query." };
     }
 
-    // =========================
     // PAYMENT
-    // =========================
-    if (intent.type === "payment") {
+if (intent.type === "payment") {
+  const vendor = findVendor(intent.vendor);
+  if (!vendor) {
+    return {
+      reply: `I don't know vendor "${intent.vendor}". Ask admin to onboard this shop first.`
+    };
+  }
 
-      let amount = intent.amount;
+  let amount = intent.amount;
 
-      // INR → CELO conversion
-      if (intent.currency === "inr") {
-        amount = await inrToCelo(amount);
-      }
+  if (intent.currency === "inr") {
+    amount = await inrToCelo(amount);
+  }
 
-      amount = Number(amount);
+  amount = Number(amount);
 
-      if (!amount || amount <= 0) {
-        return { reply: "Invalid payment amount." };
-      }
+  if (!amount || amount <= 0) {
+    return { reply: "Invalid payment amount." };
+  }
 
-      const txHash = await sendTx(intent.address, amount);
+  if (Number(vendor.limit) && amount > Number(vendor.limit)) {
+    return {
+      reply: `This exceeds the limit for ${vendor.name} (${vendor.limit} CELO).`
+    };
+  }
 
-      memory.save({
-        vendor: intent.vendor,
-        celoSent: amount,
-        txHash: txHash,
-        time: Date.now()
-      });
+  const txHash = await sendTx(vendor.address, amount);
 
-      return {
-        reply: `Paid ${amount} CELO to ${intent.vendor}`,
-        txHash
-      };
-    }
+  memory.save({
+    vendor: vendor.name,
+    celoSent: amount,
+    txHash,
+    time: Date.now()
+  });
+
+  return {
+    reply: `Paid ${amount} CELO to ${vendor.name}`,
+    txHash
+  };
+}
 
     return { reply: "Unknown command." };
 

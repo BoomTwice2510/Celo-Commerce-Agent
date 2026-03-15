@@ -1,69 +1,66 @@
-import vendors from "./vendors.js"
+// parser.js
 
-function detectVendor(text){
+import { listVendors } from "./vendorStore.js";
 
-  const lower = text.toLowerCase()
+function detectVendor(text) {
+  const lower = text.toLowerCase();
+  const vendors = listVendors(); // [{name, address, limit, ...}]
 
-  for (const v of Object.keys(vendors)) {
-    if (lower.includes(v.toLowerCase())) {
-      return v
+  for (const v of vendors) {
+    if (lower.includes(v.name.toLowerCase())) {
+      return v.name;
     }
   }
 
-  return null
+  return null;
 }
 
-export default function parseMessage(text){
+export default function parseMessage(text) {
+  if (!text) return null;
 
-  if(!text) return null
-
-  text = text.toLowerCase().trim()
+  text = text.toLowerCase().trim();
 
   // ===== QUERIES =====
 
-  if(text.includes("last payment")){
-    return { type:"query", action:"last_payment" }
+  if (text.includes("last payment")) {
+    return { type: "query", action: "last_payment" };
   }
 
-  if(text.includes("total spending") || text.includes("total spent")){
-    return { type:"query", action:"total_spent" }
+  if (text.includes("total spending") || text.includes("total spent")) {
+    return { type: "query", action: "total_spent" };
   }
 
-  if(text.includes("how much") && text.includes("pay")){
-    const vendor = detectVendor(text)
-    if(vendor){
-      return { type:"query", action:"vendor_total", vendor }
+  if (text.includes("how much") && text.includes("pay")) {
+    const vendor = detectVendor(text);
+    if (vendor) {
+      return { type: "query", action: "vendor_total", vendor };
     }
   }
 
   // ===== PAYMENTS =====
 
-  const vendor = detectVendor(text)
-  if(!vendor) return null
+  const vendor = detectVendor(text);
+  if (!vendor) return null;
 
-  const amountMatch = text.match(/(\d+(\.\d+)?)/)
-
-  if(!amountMatch){
+  const amountMatch = text.match(/(\d+(\.\d+)?)/);
+  if (!amountMatch) {
     return {
-      type:"error",
-      message:"Amount not detected"
-    }
+      type: "error",
+      message: "Amount not detected"
+    };
   }
 
-  const amount = amountMatch[0]
+  const amount = amountMatch[0];
 
-  let currency = "celo"
-
-  if(text.includes("rupee") || text.includes("rs") || text.includes("inr")){
-    currency = "inr"
+  let currency = "celo";
+  if (text.includes("rupee") || text.includes("rs") || text.includes("inr")) {
+    currency = "inr";
   }
 
   return {
-    type:"payment",
+    type: "payment",
     vendor,
-    address: vendors[vendor].address,
     amount,
     currency
-  }
-
+  };
 }

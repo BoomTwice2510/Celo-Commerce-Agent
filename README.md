@@ -1,58 +1,62 @@
-# Celo Commerce Agent 🛍️
-
-AI‑style chat agent that turns natural‑language requests like  
+Celo Commerce Agent 🛍️
+AI‑style chat agent that turns natural‑language requests like
 “Pay 1 rupee to ramesh” into real CELO payments, with memory, limits, and vendor insights on Celo.
 
-Built for the **Build Agents for the Real World – Celo Hackathon V2**.
+Built for the Build Agents for the Real World – Celo Hackathon V2 and registered as an ERC‑8004 agent.
 
----
-
-## 1. Problem
-
+1. Problem
 Local commerce still runs on:
 
-- Cash / manual UPI.
-- Zero memory of past payments.
-- Users having to remember amounts, vendors, and balances.
+Cash / manual UPI.
 
-There is no simple **chat‑first agent** that understands natural language, converts from local currency (INR) to CELO, executes the payment on‑chain, and then lets you ask questions like *“How much did I pay my milk vendor this week?”*.
+Zero memory of past payments.
 
----
+Users having to remember amounts, vendors, and balances.
 
-## 2. Solution – Celo Commerce Agent
+There is no simple chat‑first agent that understands natural language, converts from local currency (INR) to CELO, executes the payment on‑chain, and then lets you ask questions like “How much did I pay my milk vendor this week?”.
 
+2. Solution – Celo Commerce Agent
 Celo Commerce Agent is a lightweight payment agent for local merchants:
 
-- Chat interface where users type or speak instructions.
-- Rule‑based parser that understands a small payment/query DSL via natural language.
-- Payment rail on **Celo (Forno RPC)** using a funded hot wallet.
-- **INR → CELO FX** via CoinGecko, with per‑payment and per‑vendor safety limits.
-- Agent **memory** stored in `memory.json`, powering analytics:
-  - Last payment
-  - Total spent
-  - Total paid per vendor
-- QR support for merchant discovery and auto‑filling pay commands.
-- Vendor leaderboard + activity feed for a quick overview.
+Mobile‑friendly chat interface where users type instructions.
 
-The agent focuses on one clear use case: **repeat local payments to known vendors**, executed reliably instead of over‑engineered “do everything” logic.[web:36][web:37]
+Rule‑based parser that understands a small payment/query DSL via natural language.
 
----
+Payment rail on Celo (Forno RPC) using an agent‑controlled wallet.
 
-## 3. Features
+INR → CELO FX via CoinGecko, with per‑payment and per‑vendor safety limits.
 
-### Chat + Commands
+Agent memory stored in memory.json, powering analytics:
 
+Last payment
+
+Total spent
+
+Total paid per vendor
+
+QR support for merchant discovery and auto‑filling pay commands.
+
+Simple vendor leaderboard / history in the UI.
+
+The agent focuses on one clear use case: repeat local payments to known vendors, executed reliably instead of over‑engineered “do everything” logic.
+
+3. Features
+Chat + Commands
 Supported natural‑language patterns (examples):
 
-- `Pay 1 rupee to ramesh`
-- `Pay 0.01 celo to ramesh`
-- `Show last payment`
-- `Show total spending`
-- `How much did I pay ramesh`
+Pay 1 rupee to ramesh
+
+Pay 0.01 celo to ramesh
+
+Show last payment
+
+Show total spending
+
+How much did I pay ramesh
 
 Under the hood, each message is parsed into:
 
-```ts
+ts
 {
   type: "payment" | "query",
   action?: "last_payment" | "total_spent" | "vendor_total",
@@ -62,9 +66,9 @@ Under the hood, each message is parsed into:
   address?: string
 }
 Payments on Celo
-Uses ethers + Forno RPC (RPC_URL) to send native CELO.
+Uses ethers + Celo RPC (RPC_URL) to send native CELO from the agent wallet.
 
-INR amounts are converted to CELO using CoinGecko’s simple/price API.[file:50][web:37]
+INR amounts are converted to CELO using CoinGecko’s simple/price API.
 
 Safety rails:
 
@@ -72,7 +76,7 @@ MAX_PAYMENT = 500 CELO hard cap per payment.
 
 Agent checks wallet balance before sending.
 
-Per‑vendor cap: if total to a vendor exceeds 20 CELO, payment is blocked.[file:50]
+Per‑vendor cap: if total to a vendor exceeds 20 CELO, payment is blocked.
 
 Agent Memory
 All executed payments are appended to memory.json:
@@ -84,7 +88,7 @@ json
   "txHash": "0x...",
   "time": 1773557450366
 }
-Memory API functions:
+Memory helper functions:
 
 getLastPayment()
 
@@ -94,64 +98,59 @@ getVendorTotal(vendor)
 
 getAll()
 
-This powers the chat queries and the dashboard charts / leaderboard.
+These power both chat queries and the simple dashboard.
 
 Dashboard UI
-Clean WhatsApp‑style chat bubbles on white background (only green & yellow accents).
+Clean WhatsApp‑style chat bubbles on white background with green/yellow accents.
 
 Balance pill with CELO balance.
 
-Agent activity log (latest at top).
-
-Payments bar chart by vendor.
-
-Vendor leaderboard card, highlighted with yellow/green border.
+Basic activity log and vendor totals fetched from /api/pay + memory.json.
 
 4. Architecture
 High‑level:
 
-Frontend: index.html
+Frontend: public/index.html
 
-Plain HTML/JS/CSS, Chart.js for graphs.
+Plain HTML/JS/CSS.
 
-Calls backend at POST /pay, GET /balance, GET /payments.
+Calls backend at POST /api/pay.
 
-Handles voice input (Web Speech API) and QR scanning (html5-qrcode).
+Handles voice input (Web Speech API) and QR scanning (html5‑qrcode).
 
-Backend: Node.js + Express (server.js)
+Backend: Vercel API routes (Node.js)
 
-POST /pay – main agent endpoint
-
-GET /balance – wallet address & CELO balance
-
-GET /payments – raw memory data
+api/pay.js – main agent endpoint (wraps engine.js).
 
 Core modules:
 
 parser.js – rule‑based intent parsing.
 
+engine.js – orchestrates parse → checks → FX → sendTx → memory.
+
 sendTx.js – uses ethers wallet to send CELO.
 
 convert.js – INR → CELO via CoinGecko.
+
+wallet.js – provider + signer helpers.
 
 memory.js – JSON‑file storage for payments.
 
 vendors.js – vendor → address mapping.
 
-qr.js – helper for reading QR payloads (used in frontend).
+qr.js – helper for reading QR payloads.
 
-5. Backend Endpoints
-POST /pay
+5. Backend Endpoint
+POST /api/pay
 Request:
 
 json
 {
   "message": "Pay 1 rupee to ramesh"
 }
-Possible responses:
+Successful payment:
 
 json
-// Successful payment
 {
   "success": true,
   "vendor": "ramesh",
@@ -159,133 +158,136 @@ json
   "txHash": "0x...",
   "reply": "Payment sent: 0.0146 CELO to ramesh"
 }
+Query response:
+
 json
-// Query
 {
   "success": true,
   "reply": "Total spent: 0.3356 CELO"
 }
+Error example:
+
 json
-// Error
 {
   "success": false,
   "error": "Vendor spending limit reached"
 }
-GET /balance
-Returns wallet address and CELO balance:
-
-json
-{
-  "address": "0x...",
-  "balance": "3.8657"
-}
-GET /payments
-Returns array of all payment records from memory.
-
 6. Running Locally
-1) Clone & install
+Clone & install
+
 bash
-git clone https://github.com/<your-username>/celo-commerce-agent.git
+git clone https://github.com/boomtwice2510/celo-commerce-agent.git
 cd celo-commerce-agent
 npm install
-2) Configure environment
-Create .env from example:
+Configure environment
+
+Create .env:
 
 bash
-cp .env.example .env
-.env:
+RPC_URL=https://forno.celo.org          # or Celo Sepolia RPC
+PRIVATE_KEY=0xYOUR_PRIVATE_KEY          # funded wallet (test funds for dev)
+Use a low‑funded wallet; do not use a primary mainnet key.
 
-text
-RPC_URL=https://forno.celo.org   # or Celo Sepolia RPC
-PRIVATE_KEY=0xYOUR_PRIVATE_KEY   # funded test wallet
-Use a test wallet with limited funds. Do not put a mainnet key here.
+Start dev server
 
-3) Start backend
 bash
-npm run start
-# Agent running on port 3000
-4) Open frontend
-Open index.html directly in a browser, or serve via simple static server (npx serve . etc).
+npm run dev
+# App running on http://localhost:3000
+Open frontend
 
-Make sure browser and backend are on the same machine (calls http://localhost:3000/pay).
+Open http://localhost:3000/ in the browser.
+Chat UI will call http://localhost:3000/api/pay.
 
-7. Sample Flows to Demo
+7. Deployment
+Frontend + backend: deployed on Vercel.
+
+Live app: https://celo-commerce.vercel.app/
+
+APIs:
+
+POST https://celo-commerce.vercel.app/api/pay
+
+8. ERC‑8004 / Agent Identity
+This agent is registered as an ERC‑8004 identity:
+
+Agentscan page:
+https://agentscan.info/agents/20e4fdaa-ef25-4df1-8fb6-cf92686238e7
+
+Services:
+
+agentWallet – eip155:42220:0x... (Celo mainnet agent wallet).
+
+This makes the agent discoverable by 8004‑compatible explorers and tools.
+
+9. Sample Flows to Demo
 INR payment via chat
+User types: Pay 1 rupee to ramesh.
 
-Input: Pay 1 rupee to ramesh
+Agent detects amount=1, currency=inr, vendor=ramesh.
 
-Agent:
-
-Detects amount=1, currency=inr, vendor=ramesh.
-
-Fetches INR→CELO price, converts amount.
+Fetches INR→CELO, converts amount.
 
 Checks balances and limits, sends CELO payment.
 
-Replies Payment sent: X CELO to ramesh with tx link in UI.
+Replies with Payment sent: X CELO to ramesh plus tx hash (linked in UI).
 
 History query
-
 Input: Show last payment
 
 Agent reads memory.json and responds with last vendor & amount.
 
 Vendor analytics
-
 Input: How much did I pay ramesh
 
-Agent aggregates all payments to ramesh and replies with total.
-
-Dashboard updates chart + leaderboard.
+Agent aggregates all payments to ramesh and replies with the total.
 
 QR flow
+User scans merchant QR (contains { vendor, address }).
 
-User scans merchant QR.
+UI pre‑fills Pay <amount> to <vendor> and calls /api/pay.
 
-QR payload contains { vendor, amount, address }.
-
-UI fills Pay <amount> to <vendor> and calls /pay.
-
-8. Design Decisions & Future Work
+10. Design Decisions & Future Work
 Why Celo?
 
-Fast finality & low fees make high‑frequency agent payments viable.[web:37]
+Fast finality & low fees make high‑frequency agent payments viable.
 
-Mobile‑first + stablecoin support fits local commerce and small‑ticket payments.[web:37]
+Mobile‑first focus and stablecoins fit local, small‑ticket commerce.
 
-Limitations / Next steps:
+Limitations / next steps:
 
-Parser is currently rule‑based; can be upgraded to LLM‑powered intent classification with guardrails.
+Parser is rule‑based; can be upgraded to LLM‑powered intent classification with guardrails.
 
-Memory is a JSON file – can be replaced by a small database (SQLite/Postgres) with richer analytics.
+Memory is a JSON file – can move to SQLite/Postgres for richer analytics.
 
-Vendor discovery is static; can be extended with on‑chain registry / ERC‑8004 skills.[web:36][web:37]
+Vendor discovery is static; future version can use an on‑chain vendor registry / 8004 skills.
 
 Wallet is a hot key; production version should use contract wallet or MPC custody.
 
-9. Hackathon Links
-Hackathon: Build Agents for the Real World – Celo Hackathon V2
-
-Docs: 
-Build with AI on Celo
-[web:37]
-
-Agent examples: 
-AI Agents Examples – Celo Docs
-[web:51]
-
-10. Repository Structure
+11. Repository Structure
 text
 .
-├─ index.html          # Frontend UI (chat, dashboard, QR)
-├─ server.js           # Express backend / main agent API
-├─ parser.js           # Natural language → structured command
-├─ sendTx.js           # Ethers wallet sending CELO txs
-├─ convert.js          # INR → CELO via CoinGecko
-├─ memory.js           # JSON-based agent memory
-├─ memory.json         # Example payment history
-├─ vendors.js          # Vendor → address mapping
-├─ qr.js               # QR payload parser (used by frontend)
+├─ .vercel/              # Vercel deployment metadata
+├─ api/
+│  ├─ pay.js             # /api/pay endpoint (main agent API)
+│  └─ sendTx.js          # Low-level CELO transfer helper for API
+├─ lib/
+│  └─ wallet.js          # Ethers provider + wallet utils
+├─ node_modules/
+├─ public/
+│  ├─ index.html         # Frontend chat UI (served by Vercel)
+│  └─ logo.png           # Agent logo (used in UI + Agentscan)
+├─ memory.json           # JSON payment history store
+├─ .env                  # Local env vars (RPC_URL, PRIVATE_KEY)
+├─ .env.example          # Sample env template
+├─ .env.local            # Optional local overrides for dev
+├─ .gitignore
+├─ convert.js            # INR → CELO conversion logic
+├─ engine.js             # Orchestrates parse → checks → sendTx → memory
+├─ memory.js             # Helper functions to read/write memory.json
 ├─ package.json
-├─ .env.example
-└─ README.md
+├─ package-lock.json
+├─ parser.js             # Natural language → structured command
+├─ qr.js                 # QR payload parser
+├─ README.md
+├─ vendors.js            # Vendor → address mapping
+└─ vercel.json           # Vercel config (routes/builds)
