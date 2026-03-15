@@ -1,57 +1,69 @@
-const vendors = require("./vendors")
+import vendors from "./vendors.js"
 
-function detectVendor(text) {
-  let vendor = null
-  Object.keys(vendors).forEach(v => {
-    if (text.includes(v)) vendor = v
-  })
-  return vendor
-}
+function detectVendor(text){
 
-function parseMessage(text) {
-  if (!text) return null
+  const lower = text.toLowerCase()
 
-  text = text.toLowerCase().trim()
-
-  // ========= QUERIES =========
-
-  if (text.includes("last payment")) {
-    return { type: "query", action: "last_payment" }
-  }
-
-  if (text.includes("total spending") || text.includes("total spent")) {
-    return { type: "query", action: "total_spent" }
-  }
-
-  // "how much did i pay <vendor>"
-  if (text.includes("how much") && text.includes("pay")) {
-    const vendor = detectVendor(text)
-    if (vendor) {
-      return { type: "query", action: "vendor_total", vendor }
+  for (const v of Object.keys(vendors)) {
+    if (lower.includes(v.toLowerCase())) {
+      return v
     }
   }
 
-  // ========= PAYMENTS =========
+  return null
+}
+
+export default function parseMessage(text){
+
+  if(!text) return null
+
+  text = text.toLowerCase().trim()
+
+  // ===== QUERIES =====
+
+  if(text.includes("last payment")){
+    return { type:"query", action:"last_payment" }
+  }
+
+  if(text.includes("total spending") || text.includes("total spent")){
+    return { type:"query", action:"total_spent" }
+  }
+
+  if(text.includes("how much") && text.includes("pay")){
+    const vendor = detectVendor(text)
+    if(vendor){
+      return { type:"query", action:"vendor_total", vendor }
+    }
+  }
+
+  // ===== PAYMENTS =====
+
+  const vendor = detectVendor(text)
+  if(!vendor) return null
 
   const amountMatch = text.match(/(\d+(\.\d+)?)/)
-  let amount = "1"
-  if (amountMatch) amount = amountMatch[0]
+
+  if(!amountMatch){
+    return {
+      type:"error",
+      message:"Amount not detected"
+    }
+  }
+
+  const amount = amountMatch[0]
 
   let currency = "celo"
-  if (text.includes("rupee") || text.includes("rs") || text.includes("inr")) {
+
+  if(text.includes("rupee") || text.includes("rs") || text.includes("inr")){
     currency = "inr"
   }
 
-  const vendor = detectVendor(text)
-  if (!vendor) return null
-
   return {
-    type: "payment",
-    amount,
-    currency,
+    type:"payment",
     vendor,
-    address: vendors[vendor]
+    address: vendors[vendor].address,
+    amount,
+    currency
   }
-}
 
-module.exports = parseMessage
+}

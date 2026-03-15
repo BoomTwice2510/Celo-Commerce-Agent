@@ -1,13 +1,28 @@
 module.exports = {
 
-ramesh:"0x1f410eb28bec2247f617e6b86b10350d77dc9679",
+  ramesh: {
+    address: "0x1f410eb28bec2247f617e6b86b10350d77dc9679",
+    category: "tea"
+  },
 
-milk:"0x1f410eb28bec2247f617e6b86b10350d77dc9679",
+  milk: {
+    address: "0x1f410eb28bec2247f617e6b86b10350d77dc9679",
+    category: "grocery"
+  },
 
-electricity:"0x1f410eb28bec2247f617e6b86b10350d77dc9679",
+  electricity: {
+    address: "0x1f410eb28bec2247f617e6b86b10350d77dc9679",
+    category: "utility"
+  },
 
-internet:"0x1f410eb28bec2247f617e6b86b10350d77dc9679",
+  internet: {
+    address: "0x1f410eb28bec2247f617e6b86b10350d77dc9679",
+    category: "utility"
+  },
 
-water:"0x1f410eb28bec2247f617e6b86b10350d77dc9679"
+  water: {
+    address: "0x1f410eb28bec2247f617e6b86b10350d77dc9679",
+    category: "utility"
+  }
 
 }

@@ -1,12 +1,6 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "server.js", "use": "@vercel/node" }
-  ],
   "routes": [
-    { "src": "/pay", "dest": "server.js" },
-    { "src": "/balance", "dest": "server.js" },
-    { "src": "/payments", "dest": "server.js" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/", "dest": "/public/index.html" },
+    { "src": "/(.*)", "dest": "/$1" }
   ]
 }

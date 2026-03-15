@@ -519,18 +519,21 @@ async function send(){
   typing()
 
   try{
-    const res=await fetch("http://localhost:3000/pay",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:text})
-    })
+    const res = await fetch("/api/pay",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    address:"0xRecipientWallet",
+    amount:"0.001"
+  })
+})
     const data=await res.json()
     removeTyping()
     add("agent",data.reply)
     addActivity("🤖 "+data.reply)
 
     if(data.txHash){
-      add("agent","🔗 <a target='_blank' href='https://sepolia.celoscan.io/tx/"+data.txHash+"'>View Transaction</a>")
+      add("agent","🔗 <a target='_blank' href='https://celoscan.io/tx"+data.txHash+"'>View Transaction</a>")
       addActivity("⛓️ Transaction executed")
     }
 
