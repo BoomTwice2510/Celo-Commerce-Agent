@@ -3,6 +3,7 @@ require("dotenv").config()
 const express = require("express")
 const cors = require("cors")
 const { ethers } = require("ethers")
+const path = require("path")
 
 const parseMessage = require("./parser")
 const sendTx = require("./sendTx")
@@ -14,24 +15,22 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+// =============================
+// STATIC + FRONTEND
+// =============================
+
+// Sare static files (index.html, logo.png, JS, CSS) root se serve honge
+app.use(express.static(path.join(__dirname)))
+
+// Root pe index.html
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"))
+})
+
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL)
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider)
 
 const MAX_PAYMENT = 500 // CELO cap per payment
-
-// =============================
-// ROOT ENDPOINT (Vercel preview)
-// =============================
-app.get("/", (req, res) => {
-  res.json({
-    agent: "Celo Local Commerce Agent ✅",
-    endpoints: {
-      pay: "POST /pay {message: 'Pay 10 rupee to vendor'}",
-      balance: "GET /balance", 
-      payments: "GET /payments"
-    }
-  })
-})
 
 // =============================
 // PAYMENT ENDPOINT
@@ -49,7 +48,8 @@ app.post("/pay", async (req, res) => {
     return res.json({
       success: false,
       error: "Could not understand message",
-      reply: "Sorry, I could not understand that. Try: 'Pay 1 rupee to ramesh' or 'Show last payment'."
+      reply:
+        "Sorry, I could not understand that. Try: 'Pay 1 rupee to ramesh' or 'Show last payment'."
     })
   }
 
