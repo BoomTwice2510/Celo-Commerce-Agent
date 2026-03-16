@@ -7,9 +7,5 @@ module.exports = function handler(req, res) {
       .status(405)
       .json({ success: false, error: "Method not allowed" });
   }
-
-  return res.status(200).json({
-    success: true,
-    vendors: listVendors()
-  });
+  return res.status(200).json({ success: true, vendors: listVendors() });
 };

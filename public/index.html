@@ -14,6 +14,7 @@
     --text-dark:#111827;
     --text-muted:#6b7280;
     --border-soft:#e5e7eb;
+    --bg-soft:#f3f4f6;
   }
 
   *{box-sizing:border-box;}
@@ -21,52 +22,56 @@
   body{
     margin:0;
     font-family:system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
-    background:#f9fafb;
+    background:#020617;
     color:var(--text-dark);
     display:flex;
     justify-content:center;
-    padding:16px 8px;
+    padding:10px 8px;
   }
 
   .app{
     width:100%;
-    max-width:960px;
-    padding:16px;
-    border-radius:18px;
-    background:#ffffff;
-    box-shadow:0 10px 30px rgba(15,23,42,.08);
-    border:2px solid #facc15;
+    max-width:520px;
+    padding:12px;
+    border-radius:24px;
+    background:radial-gradient(circle at top,#fef9c3 0,#ffffff 45%,#e5e7eb 100%);
+    box-shadow:0 18px 45px rgba(15,23,42,.45);
+    border:1px solid rgba(250,204,21,.8);
+    position:relative;
+    overflow:hidden;
   }
+
+  /* HEADER */
 
   .header{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    gap:12px;
-    flex-wrap:wrap;
-    margin-bottom:12px;
+    gap:10px;
+    margin-bottom:10px;
   }
 
   .title{
     display:flex;
     align-items:center;
-    gap:10px;
+    gap:8px;
   }
 
   .logo-wrap{
-    width:46px;
-    height:46px;
-    border-radius:16px;
+    width:40px;
+    height:40px;
+    border-radius:14px;
     background:#fefce8;
-    border:1px solid rgba(234,179,8,.6);
-    padding:4px;
+    border:1px solid rgba(234,179,8,.7);
+    padding:3px;
+    box-shadow:0 4px 10px rgba(234,179,8,.4);
   }
 
   .logo-wrap img{
     width:100%;
     height:100%;
     display:block;
-    border-radius:12px;
+    border-radius:11px;
   }
 
   .title-text{
@@ -75,25 +80,25 @@
   }
 
   .title-main{
-    font-size:18px;
+    font-size:17px;
     font-weight:650;
   }
 
   .title-sub{
-    font-size:12px;
+    font-size:11px;
     color:var(--text-muted);
   }
 
   .pill-row{
     display:flex;
     flex-wrap:wrap;
-    gap:6px;
-    margin-top:4px;
+    gap:4px;
+    margin-top:3px;
   }
 
   .pill{
-    font-size:10px;
-    padding:3px 8px;
+    font-size:9px;
+    padding:2px 7px;
     border-radius:999px;
     border:1px solid #e5e7eb;
     text-transform:uppercase;
@@ -102,19 +107,25 @@
     background:#f9fafb;
   }
 
-  .wallet{
+  .wallet-row{
     display:flex;
-    gap:8px;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:6px;
+  }
+
+  .wallet-main{
+    display:flex;
     align-items:center;
-    flex-wrap:wrap;
+    gap:6px;
   }
 
   .balance{
     background:#ecfdf5;
-    padding:6px 10px;
+    padding:5px 9px;
     border-radius:999px;
     border:1px solid rgba(22,163,74,.8);
-    font-size:12px;
+    font-size:11px;
     display:flex;
     gap:4px;
     align-items:center;
@@ -153,11 +164,80 @@
     border:1px solid rgba(202,138,4,.85);
   }
 
+  .wallet-tools{
+    display:flex;
+    gap:6px;
+    justify-content:flex-end;
+  }
+
+  /* HAMBURGER MENU */
+
+  .menu-btn{
+    width:32px;
+    height:32px;
+    border-radius:999px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(15,23,42,.9);
+    color:#e5e7eb;
+    border:1px solid rgba(148,163,184,.8);
+    box-shadow:0 4px 14px rgba(15,23,42,.6);
+    font-size:16px;
+  }
+
+  .menu-panel{
+    position:absolute;
+    top:50px;
+    right:10px;
+    width:190px;
+    border-radius:16px;
+    background:#020617;
+    color:#e5e7eb;
+    box-shadow:0 18px 40px rgba(15,23,42,.8);
+    border:1px solid rgba(148,163,184,.6);
+    padding:10px 10px 8px;
+    font-size:12px;
+    transform:translateY(-10px);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .14s ease,transform .14s ease;
+    z-index:30;
+  }
+
+  .menu-panel.show{
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+  }
+
+  .menu-item{
+    padding:7px 8px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    cursor:pointer;
+    border:1px solid transparent;
+  }
+
+  .menu-item span.icon{
+    width:18px;
+    text-align:center;
+  }
+
+  .menu-item:hover{
+    background:rgba(55,65,81,.9);
+    border-color:rgba(148,163,184,.9);
+  }
+
+  /* CARDS & CHAT */
+
   .card{
     background:#ffffff;
-    border-radius:16px;
+    border-radius:18px;
     border:1px solid rgba(226,232,240,1);
-    box-shadow:0 6px 18px rgba(15,23,42,.04);
+    box-shadow:0 6px 18px rgba(15,23,42,.06);
     position:relative;
   }
 
@@ -168,9 +248,13 @@
     right:0;
     top:0;
     height:3px;
-    border-radius:16px 16px 0 0;
+    border-radius:18px 18px 0 0;
     background:linear-gradient(90deg,#22c55e,#facc15);
-    opacity:.6;
+    opacity:.7;
+  }
+
+  .chat-card{
+    margin-top:4px;
   }
 
   .chat{
@@ -178,7 +262,7 @@
     overflow:auto;
     padding:10px 10px 4px;
     background:#f3f4f6;
-    border-radius:16px 16px 0 0;
+    border-radius:18px 18px 0 0;
   }
 
   .chat::-webkit-scrollbar{width:5px;}
@@ -243,38 +327,6 @@
     color:var(--text-muted);
   }
 
-  .inputArea{
-    display:flex;
-    gap:8px;
-    padding:8px;
-    border-top:1px solid var(--border-soft);
-    background:#ffffff;
-    border-radius:0 0 16px 16px;
-  }
-
-  input{
-    flex:1;
-    padding:9px 10px;
-    border-radius:999px;
-    border:1px solid #e5e7eb;
-    background:#ffffff;
-    color:var(--text-dark);
-    font-size:13px;
-    outline:none;
-  }
-
-  input::placeholder{color:#9ca3af;}
-
-  input:focus{
-    border-color:#22c55e;
-    box-shadow:0 0 0 1px rgba(34,197,94,.3);
-  }
-
-  .send-btn{
-    background:linear-gradient(135deg,#facc15,#22c55e);
-    white-space:nowrap;
-  }
-
   .suggest{
     display:flex;
     flex-wrap:wrap;
@@ -300,31 +352,71 @@
     border-color:#facc15;
   }
 
-  .dashboard{
-    margin-top:14px;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
+  .inputArea{
+    display:flex;
+    gap:8px;
+    padding:8px;
+    border-top:1px solid var(--border-soft);
+    background:#ffffff;
+    border-radius:0 0 18px 18px;
   }
 
-  @media(max-width:768px){
-    .dashboard{grid-template-columns:1fr;}
-  }
-
-  .dashboard .card{
-    padding:10px 10px 12px;
-  }
-
-  .card h3{
-    margin:0 0 6px;
+  input{
+    flex:1;
+    padding:9px 10px;
+    border-radius:999px;
+    border:1px solid #e5e7eb;
+    background:#ffffff;
+    color:var(--text-dark);
     font-size:13px;
-    letter-spacing:.03em;
+    outline:none;
+  }
+
+  input::placeholder{color:#9ca3af;}
+
+  input:focus{
+    border-color:#22c55e;
+    box-shadow:0 0 0 1px rgba(34,197,94,.3);
+  }
+
+  .send-btn{
+    background:linear-gradient(135deg,#facc15,#22c55e);
+    white-space:nowrap;
+  }
+
+  /* PANELS for bottom + hamburger */
+
+  .panel-shell{
+    margin-top:10px;
+    border-radius:18px;
+    overflow:hidden;
+    border:1px solid rgba(226,232,240,1);
+    background:#ffffff;
+    box-shadow:0 6px 18px rgba(15,23,42,.06);
+  }
+
+  .panels{
+    padding:9px 10px 10px;
+    max-height:230px;
+    overflow:auto;
+    display:none;
+    font-size:12px;
+  }
+
+  .panels.show{
+    display:block;
+  }
+
+  .panel-title{
+    font-size:11px;
     text-transform:uppercase;
+    letter-spacing:.08em;
     color:#6b7280;
+    margin-bottom:4px;
   }
 
   #activity{
-    max-height:220px;
+    max-height:190px;
     overflow:auto;
     padding-right:2px;
     font-size:12px;
@@ -349,48 +441,122 @@
     width:100%;
   }
 
-  .leader-card{
-    border:1px solid #facc15;
-    box-shadow:0 6px 18px rgba(234,179,8,.18);
-  }
-
-  .leader-card::before{
-    background:linear-gradient(90deg,#facc15,#22c55e);
-    opacity:.9;
-  }
-
-  #leader div{
+  .leader-row{
+    font-size:12px;
     background:#fefce8;
     border-radius:8px;
     padding:6px 8px;
     border:1px solid #fde68a;
     margin-bottom:6px;
-    font-size:12px;
     display:flex;
     justify-content:space-between;
     color:#374151;
   }
 
-  #leader div span.name{font-weight:500;}
-  #leader div span.amt{
+  .leader-row span.name{font-weight:500;}
+  .leader-row span.amt{
     font-variant-numeric:tabular-nums;
     color:#16a34a;
   }
 
+  #vendor-list{
+    font-size:12px;
+    color:#4b5563;
+  }
+
+  #vendor-list div{
+    padding:4px 0;
+    border-bottom:1px dashed #e5e7eb;
+  }
+
+  /* QR READER INLINE CARD */
+
+  #reader-card{
+    position:absolute;
+    top:60px;
+    left:50%;
+    transform:translateX(-50%);
+    width:260px;
+    background:#020617;
+    border-radius:16px;
+    padding:10px;
+    border:1px solid rgba(148,163,184,.7);
+    box-shadow:0 20px 45px rgba(15,23,42,.85);
+    z-index:25;
+    display:none;
+  }
+
   #reader{
-    margin-top:6px;
-    max-width:220px;
+    max-width:240px;
+    margin:6px auto 0;
     border-radius:12px;
     overflow:hidden;
     border:1px solid #e5e7eb;
   }
 
+  #reader-title{
+    color:#e5e7eb;
+    font-size:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  #reader-title button{
+    padding:2px 8px;
+    font-size:11px;
+    box-shadow:none;
+  }
+
+  /* BOTTOM TABS */
+
+  .tab-bar{
+    margin-top:8px;
+    display:flex;
+    justify-content:space-between;
+    gap:6px;
+  }
+
+  .tab{
+    flex:1;
+    border-radius:999px;
+    padding:6px 6px;
+    font-size:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    border:1px solid #e5e7eb;
+    background:#f9fafb;
+    color:#4b5563;
+    cursor:pointer;
+    transition:background .12s ease,border-color .12s ease,transform .08s ease;
+  }
+
+  .tab span.icon{
+    font-size:13px;
+  }
+
+  .tab.active{
+    background:linear-gradient(135deg,#22c55e,#16a34a);
+    color:#ecfdf5;
+    border-color:#16a34a;
+    box-shadow:0 4px 12px rgba(22,163,74,.4);
+    transform:translateY(-1px);
+  }
+
+  .footer-note{
+    margin-top:6px;
+    font-size:10px;
+    text-align:center;
+    color:#9ca3af;
+  }
+
   @media(max-width:600px){
     .app{
-      padding:12px;
-      border-radius:16px;
+      padding:10px;
+      border-radius:20px;
     }
-    .title-main{font-size:16px;}
     .chat{height:320px;}
   }
   </style>
@@ -408,24 +574,51 @@
         <div class="title-main">Celo Commerce Agent</div>
         <div class="title-sub">Local commerce • Smart Celo payments</div>
         <div class="pill-row">
-          <div class="pill">On‑chain payments</div>
-          <div class="pill">Celo •</div>
+          <div class="pill">On‑chain</div>
+          <div class="pill">Celo • Mini app</div>
         </div>
       </div>
     </div>
 
-    <div class="wallet">
-      <div id="balance" class="balance">
-        💰 <span>Balance:</span> <span class="amount">--</span>
+    <div class="wallet-row">
+      <div class="wallet-main">
+        <div id="balance" class="balance">
+          💰 <span>Balance:</span> <span class="amount">--</span>
+        </div>
+        <button id="wallet-btn" onclick="connectWallet()">Connect</button>
+        <button class="menu-btn" id="menu-btn">☰</button>
       </div>
-      <button onclick="connectWallet()">Connect</button>
-      <button class="icon-btn" onclick="voice()">🎤</button>
-      <button class="icon-btn" onclick="startQR()">QR</button>
-      <div id="reader"></div>
+      <div class="wallet-tools">
+        <button class="icon-btn" onclick="voice()">🎤</button>
+        <button class="icon-btn" onclick="toggleQR()">QR</button>
+      </div>
     </div>
   </div>
 
-  <div class="card">
+  <!-- HAMBURGER PANEL -->
+  <div id="menu-panel" class="menu-panel">
+    <div class="menu-item" onclick="openPanel('vendors')">
+      <span class="icon">📚</span><span>Current vendors</span>
+    </div>
+    <div class="menu-item" onclick="openPanel('onboard')">
+      <span class="icon">🛍️</span><span>Vendor onboarding</span>
+    </div>
+    <div class="menu-item" onclick="openPanel('leader')">
+      <span class="icon">🏆</span><span>Vendor leaderboard</span>
+    </div>
+  </div>
+
+  <!-- QR CARD -->
+  <div id="reader-card">
+    <div id="reader-title">
+      <span>Scan merchant QR</span>
+      <button onclick="closeQR()">Close</button>
+    </div>
+    <div id="reader"></div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="card chat-card">
     <div id="chat" class="chat"></div>
     <div class="suggest" id="suggest"></div>
     <div class="inputArea">
@@ -434,47 +627,77 @@
     </div>
   </div>
 
-  <div class="dashboard">
-    <div class="card">
-      <h3>📡 Agent Activity</h3>
-      <div id="activity"></div>
+  <!-- PANELS SHELL -->
+  <div class="panel-shell">
+    <div id="panel-rates" class="panels">
+      <div class="panel-title">💱 Celo ↔ INR rate</div>
+      <div id="rate-box" style="font-size:12px;color:#374151;">
+        Live rate: <span id="rate-value">--</span>
+      </div>
     </div>
 
-    <div class="card">
-      <h3>📊 Payments</h3>
+    <div id="panel-chart" class="panels">
+      <div class="panel-title">📊 Payments</div>
       <canvas id="chart"></canvas>
     </div>
 
-    <div class="card leader-card" style="grid-column:1 / -1;">
-      <h3>🏆 Vendor Leaderboard</h3>
+    <div id="panel-samples" class="panels">
+      <div class="panel-title">⚡ Sample commands</div>
+      <div id="samples-list"></div>
+    </div>
+
+    <div id="panel-activity" class="panels">
+      <div class="panel-title">📡 Agent activity</div>
+      <div id="activity"></div>
+    </div>
+
+    <div id="panel-vendors" class="panels">
+      <div class="panel-title">📚 Current vendors</div>
+      <div id="vendor-list"></div>
+    </div>
+
+    <div id="panel-onboard" class="panels">
+      <div class="panel-title">🛍️ Vendor onboarding (admin)</div>
+      <input id="vendor-name" placeholder="Vendor name" />
+      <input id="vendor-address" placeholder="Wallet address (0x...)" />
+      <input id="vendor-limit" placeholder="Limit in CELO (optional)" />
+      <input id="vendor-pin" placeholder="Admin PIN" type="password" />
+      <button style="margin-top:6px;" onclick="addVendor()">Add vendor</button>
+      <div id="vendor-status" style="font-size:11px;margin-top:4px;color:#4b5563;"></div>
+    </div>
+
+    <div id="panel-leader" class="panels">
+      <div class="panel-title">🏆 Vendor leaderboard</div>
       <div id="leader"></div>
     </div>
   </div>
 
-  <!-- Current vendors list -->
-  <div class="card" style="margin-top:12px;padding:10px 10px 12px;">
-    <h3>📚 Current vendors</h3>
-    <div id="vendor-list" style="font-size:12px;color:#4b5563;"></div>
+  <!-- BOTTOM TABS -->
+  <div class="tab-bar">
+    <div class="tab" id="tab-rates" onclick="switchTab('rates')">
+      <span class="icon">💱</span><span>Rate</span>
+    </div>
+    <div class="tab" id="tab-chart" onclick="switchTab('chart')">
+      <span class="icon">📊</span><span>Chart</span>
+    </div>
+    <div class="tab" id="tab-samples" onclick="switchTab('samples')">
+      <span class="icon">⚡</span><span>Samples</span>
+    </div>
+    <div class="tab" id="tab-activity" onclick="switchTab('activity')">
+      <span class="icon">📡</span><span>Activity</span>
+    </div>
   </div>
 
-  <!-- Vendor onboarding (admin) -->
-  <div class="card" style="margin-top:12px;padding:10px 10px 12px;">
-    <h3>🛍️ Vendor onboarding (admin)</h3>
-    <input id="vendor-name" placeholder="Vendor name" />
-    <input id="vendor-address" placeholder="Wallet address (0x...)" />
-    <input id="vendor-limit" placeholder="Limit in CELO (optional)" />
-    <input id="vendor-pin" placeholder="Admin PIN" type="password" />
-    <button onclick="addVendor()">Add vendor</button>
-    <div id="vendor-status" style="font-size:12px;margin-top:4px;color:#4b5563;"></div>
+  <div class="footer-note">
+    Celo mini‑app demo • Local commerce agent
   </div>
-
 </div>
 
 <script>
-const chat=document.getElementById("chat");
-let chart=null;
+let currentAccount = null;
+const chat = document.getElementById("chat");
+let chart = null;
 
-/* suggestions array (base + dynamic vendors) */
 let suggestions = [
   "Show last payment",
   "Show total spending"
@@ -555,13 +778,30 @@ async function send(){
   }
 }
 
+/* WALLET */
+
 async function connectWallet(){
   if(!window.ethereum){
     alert("Install MetaMask");
     return;
   }
-  const accounts=await ethereum.request({method:"eth_requestAccounts"});
-  loadBalance(accounts[0]);
+  const accounts = await ethereum.request({ method:"eth_requestAccounts" });
+  currentAccount = accounts[0];
+  loadBalance(currentAccount);
+
+  const btn = document.getElementById("wallet-btn");
+  btn.textContent = "Disconnect";
+  btn.onclick = disconnectWallet;
+}
+
+function disconnectWallet() {
+  currentAccount = null;
+  const balanceEl = document.getElementById("balance");
+  balanceEl.querySelector(".amount").innerText = "--";
+
+  const btn = document.getElementById("wallet-btn");
+  btn.textContent = "Connect";
+  btn.onclick = connectWallet;
 }
 
 async function loadBalance(address){
@@ -584,6 +824,8 @@ async function loadBalance(address){
   balanceEl.querySelector(".amount").innerText=celo.toFixed(3)+" CELO";
 }
 
+/* VOICE */
+
 function voice(){
   const rec=new webkitSpeechRecognition();
   rec.lang="en-US";
@@ -592,6 +834,8 @@ function voice(){
   };
   rec.start();
 }
+
+/* STATS */
 
 async function loadStats(){
   try{
@@ -632,23 +876,100 @@ async function loadStats(){
     Object.entries(vendors)
       .sort((a,b)=>b[1]-a[1])
       .forEach((v,i)=>{
-        leader.innerHTML+=`
-          <div>
-            <span class="name">${i+1}. ${v[0]}</span>
-            <span class="amt">${v[1].toFixed(3)} CELO</span>
-          </div>`;
+        const row=document.createElement("div");
+        row.className="leader-row";
+        row.innerHTML = `
+          <span class="name">${i+1}. ${v[0]}</span>
+          <span class="amt">${v[1].toFixed(3)} CELO</span>
+        `;
+        leader.appendChild(row);
       });
   }catch{}
 }
 
-renderSuggestions();
-loadStats();
+/* SAMPLE COMMANDS */
 
-function startQR(){
-  const html5QrCode = new Html5Qrcode("reader");
+const sampleCommands = [
+  "Pay 1 rupee to ramesh",
+  "Pay 1 rupee to deva",
+  "Show last payment",
+  "Show total spending",
+  "How much did I pay ramesh"
+];
+
+function renderSamples(){
+  const box = document.getElementById("samples-list");
+  box.innerHTML = "";
+  sampleCommands.forEach(cmd=>{
+    const d=document.createElement("div");
+    d.textContent = cmd;
+    d.style.padding = "6px 8px";
+    d.style.borderRadius = "10px";
+    d.style.marginBottom = "4px";
+    d.style.background = "#f9fafb";
+    d.style.border = "1px solid #e5e7eb";
+    d.style.cursor = "pointer";
+    d.onclick = () => {
+      document.getElementById("input").value = cmd;
+    };
+    box.appendChild(d);
+  });
+}
+
+/* RATE (static demo) */
+
+function loadRate(){
+  const box = document.getElementById("rate-value");
+  box.textContent = "≈ 7.3 INR / CELO (static demo)";
+}
+
+/* HAMBURGER + PANELS */
+
+const menuBtn = document.getElementById("menu-btn");
+const menuPanel = document.getElementById("menu-panel");
+
+menuBtn.onclick = (e) => {
+  e.stopPropagation();
+  menuPanel.classList.toggle("show");
+};
+
+document.addEventListener("click", () => {
+  menuPanel.classList.remove("show");
+});
+
+function openPanel(which){
+  if(which === "vendors"){
+    switchTabExplicit("vendors");
+  }else if(which === "onboard"){
+    switchTabExplicit("onboard");
+  }else if(which === "leader"){
+    switchTabExplicit("leader");
+  }
+  menuPanel.classList.remove("show");
+}
+
+/* QR */
+
+let html5QrCode = null;
+
+function toggleQR(){
+  const card = document.getElementById("reader-card");
+  if(card.style.display === "block"){
+    closeQR();
+  }else{
+    openQR();
+  }
+}
+
+function openQR(){
+  const card = document.getElementById("reader-card");
+  card.style.display = "block";
+  if(!html5QrCode){
+    html5QrCode = new Html5Qrcode("reader");
+  }
   html5QrCode.start(
-    { facingMode: "environment" },
-    { fps:10, qrbox:250 },
+    { facingMode:"environment" },
+    { fps:10, qrbox:220 },
     qrCodeMessage => {
       add("agent","📷 QR scanned");
       handleQR(qrCodeMessage);
@@ -656,6 +977,14 @@ function startQR(){
     },
     errorMessage => {}
   );
+}
+
+function closeQR(){
+  const card = document.getElementById("reader-card");
+  card.style.display = "none";
+  if(html5QrCode){
+    html5QrCode.stop().catch(()=>{});
+  }
 }
 
 function handleQR(data){
@@ -670,7 +999,8 @@ function handleQR(data){
   }
 }
 
-/* Vendor onboarding helpers */
+/* VENDORS */
+
 async function addVendor() {
   const body = {
     name: document.getElementById("vendor-name").value,
@@ -703,7 +1033,6 @@ async function refreshVendors() {
     const data = await res.json();
     if (!data.success) return;
 
-    // Current vendors card
     const box = document.getElementById("vendor-list");
     box.innerHTML = "";
     data.vendors.forEach(v => {
@@ -712,7 +1041,6 @@ async function refreshVendors() {
       box.appendChild(div);
     });
 
-    // Suggestions: add vendor-specific sentences
     const vendorPhrases = data.vendors.map(v => `Pay 1 rupee to ${v.name}`);
     const base = [
       "Show last payment",
@@ -725,7 +1053,45 @@ async function refreshVendors() {
   }
 }
 
+/* TABS */
+
+function hideAllPanels(){
+  document.querySelectorAll(".panels").forEach(p=>p.classList.remove("show"));
+}
+
+function resetTabs(){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+}
+
+function switchTab(key){
+  hideAllPanels();
+  resetTabs();
+  document.getElementById("panel-"+key).classList.add("show");
+  const tab = document.getElementById("tab-"+key);
+  if (tab) tab.classList.add("active");
+  menuPanel.classList.remove("show");
+}
+
+function switchTabExplicit(panelKey){
+  hideAllPanels();
+  resetTabs();
+  document.getElementById("panel-"+panelKey).classList.add("show");
+  // default rate tab highlight for hamburger-opened panels
+  document.getElementById("tab-rates").classList.add("active");
+}
+
+/* INIT */
+
+renderSuggestions();
+renderSamples();
+loadStats();
+loadRate();
 refreshVendors();
+
+hideAllPanels();
+resetTabs();
+document.getElementById("panel-rates").classList.add("show");
+document.getElementById("tab-rates").classList.add("active");
 </script>
 </body>
 </html>

@@ -1,104 +1,41 @@
-const fs = require("fs")
+// memory.js
 
-const FILE = "./memory.json"
+const fs = require("fs");
+const path = require("path");
 
-function read(){
+const FILE = path.join(__dirname, "memory.json");
 
- try{
-
-  const data = fs.readFileSync(FILE)
-
-  return JSON.parse(data)
-
- }catch{
-
-  return []
-
- }
-
-}
-
-function write(data){
-
- fs.writeFileSync(FILE, JSON.stringify(data,null,2))
-
-}
-
-
-function savePayment(payment){
-
- const data = read()
-
- data.push(payment)
-
- write(data)
-
-}
-
-
-function getLastPayment(){
-
- const data = read()
-
- if(data.length === 0) return null
-
- return data[data.length - 1]
-
-}
-
-
-function getVendorTotal(vendor){
-
- const data = read()
-
- let total = 0
-
- for(const p of data){
-
-  if(p.vendor === vendor){
-
-   total += Number(p.celoSent)
-
+function load() {
+  try {
+    const raw = fs.readFileSync(FILE, "utf8");
+    return JSON.parse(raw);
+  } catch {
+    return [];
   }
-
- }
-
- return total
-
 }
 
-
-function getTotalSpent(){
-
- const data = read()
-
- let total = 0
-
- for(const p of data){
-
-  total += Number(p.celoSent)
-
- }
-
- return total
-
+function save(entry) {
+  const all = load();
+  all.push(entry);
+  fs.writeFileSync(FILE, JSON.stringify(all, null, 2));
 }
 
-
-function getAll(){
-
- return read()
-
+function last() {
+  const all = load();
+  return all[all.length - 1] || null;
 }
 
-
-
-module.exports = {
-
- savePayment,
- getLastPayment,
- getVendorTotal,
- getTotalSpent,
- getAll
-
+function total() {
+  const all = load();
+  return all.reduce((sum, x) => sum + Number(x.celoSent || 0), 0);
 }
+
+function vendor(name) {
+  const all = load();
+  const n = name.toLowerCase();
+  return all
+    .filter(x => (x.vendor || "").toLowerCase() === n)
+    .reduce((sum, x) => sum + Number(x.celoSent || 0), 0);
+}
+
+module.exports = { load, save, last, total, vendor };
